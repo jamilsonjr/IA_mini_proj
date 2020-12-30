@@ -16,65 +16,66 @@ class MDProblem :
 
         self.diseases = []
         self.symptoms = {}
-        self.exams = {{}}
+        self.exams = {}
         self.measurements = []
         
 
-        for line in f:
+        for line in fh:
                 if line.strip(): # skips blank lines
                     l = line.split() 
                     
                     # diseases
                     if(l[0] == "D"):
-                        try:
-                            for d in l[1,:]:
+                        #try:
+                            for d in l[1:]:
                                 self.diseases.append(d)
-                        except:
-                            print("Wrong format -> ", line)
-                            exit()
+                       # except:
+                        #    print("Wrong format -> ", line)
+                         #   exit()
 
                     # symptoms
                     elif(l[0] == "S"):
-                        try:
-                            self.symptoms[l[1]] = l[2,:]
-                        except:
-                            print("Wrong format -> ", line)
-                            exit()
+                        #try:
+                            print(l[2:-1])
+                            self.symptoms[l[1]] = l[2:-1]
+                        #except:
+                         #   print("Wrong format -> ", line)
+                         #   exit()
                         
                     # exams
                     elif(l[0] == "E"):
-                        try:
-                            self.exam[l[1]]['D'] = l[2]
-                            self.exam[l[1]]['TPR'] = l[3]
-                            self.exam[l[1]]['FPR'] = l[4]
-                        except:
-                            print("Wrong format -> ", line)
-                            exit()
+                        #try:
+                            self.exam[l[1]] = {'D': l[2]}
+                            self.exam[l[1]] = {'TPR': l[3]}
+                            self.exam[l[1]] = {'FPR': l[4]}
+                        #except:
+                         #   print("Wrong format -> ", line)
+                         #   exit()
                         
                     # measurements
                     elif(l[0] == "M"):
-                        try:
+                        #try:
                             dic = {}
                             for i in range(1, 2, len(l)):
                                 dic[l[i]] = l[i+1]
 
                             self.measurements.append(dic)
-                        except:
-                            print("Wrong format -> ", line)
-                            exit()
+                        #except:
+                         #   print("Wrong format -> ", line)
+                          #  exit()
                         
 
                     # propagation probability
                     elif(l[0] == "P"):
-                        try:
+                        #try:
                             self.prop_prob = l[1]
-                        except:
-                            print("Wrong format -> ", line)
-                            exit()
+                        #except:
+                         #   print("Wrong format -> ", line)
+                          #  exit()
 
-                    else:
-                        print("Wrong format -> ", line)
-                        exit()
+                    #else:
+                     #   print("Wrong format -> ", line)
+                     #   exit()
 
         print(self.diseases)
         print(self.symptoms)
