@@ -76,7 +76,6 @@ class MDProblem :
                         print("Wrong format -> ", line)
                         exit()
 
-
         print(self.diseases)
         print(self.symptoms)
         print(self.exams)
