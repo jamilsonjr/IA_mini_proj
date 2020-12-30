@@ -13,10 +13,11 @@ class MDProblem :
     #    return ( disease , likelihood )
 
     def load(self, fh):
-
+        
+        self.disea_sympt = {}
         self.diseases = []
-        self.symptoms = {}
-        self.exams = {}
+        self.sympt_disea = {}
+        self.exam = {}
         self.measurements = []
         
 
@@ -26,60 +27,68 @@ class MDProblem :
                     
                     # diseases
                     if(l[0] == "D"):
-                        #try:
+                        try:
                             for d in l[1:]:
                                 self.diseases.append(d)
-                       # except:
-                        #    print("Wrong format -> ", line)
-                         #   exit()
+                        except:
+                            print("Wrong format -> ", line)
+                            exit()
 
                     # symptoms
                     elif(l[0] == "S"):
-                        #try:
-                            print(l[2:-1])
-                            self.symptoms[l[1]] = l[2:-1]
-                        #except:
-                         #   print("Wrong format -> ", line)
-                         #   exit()
+                        try:
+                            self.sympt_disea[l[1]] = l[2:]
+                        except:
+                            print("Wrong format -> ", line)
+                            exit()
                         
                     # exams
                     elif(l[0] == "E"):
-                        #try:
-                            self.exam[l[1]] = {'D': l[2]}
-                            self.exam[l[1]] = {'TPR': l[3]}
-                            self.exam[l[1]] = {'FPR': l[4]}
-                        #except:
-                         #   print("Wrong format -> ", line)
-                         #   exit()
+                        try:
+                            self.exam[l[1]] = {'D': l[2],'TPR': l[3],'FPR': l[4]}
+                        except:
+                            print("Wrong format -> ", line)
+                            exit()
                         
                     # measurements
                     elif(l[0] == "M"):
-                        #try:
+                        try:
                             dic = {}
-                            for i in range(1, 2, len(l)):
+                            for i in range(1, len(l), 2):
                                 dic[l[i]] = l[i+1]
 
                             self.measurements.append(dic)
-                        #except:
-                         #   print("Wrong format -> ", line)
-                          #  exit()
+                        except:
+                            print("Wrong format -> ", line)
+                            exit()
                         
 
                     # propagation probability
                     elif(l[0] == "P"):
-                        #try:
+                        try:
                             self.prop_prob = l[1]
-                        #except:
-                         #   print("Wrong format -> ", line)
-                          #  exit()
+                        except:
+                            print("Wrong format -> ", line)
+                            exit()
 
-                    #else:
-                     #   print("Wrong format -> ", line)
-                     #   exit()
-
-        print(self.diseases)
-        print(self.symptoms)
-        print(self.exams)
-        print(self.measurements)
+                    else:
+                        print("Wrong format -> ", line)
+                        exit()
         
+        
+        print("Doenças = ",self.diseases)
+        print("Sintomas = ",self.sympt_disea)
+        print("Exames = ",self.exam)
+        print("Medicoes = ",self.measurements)
+        
+
+        for disease in self.diseases:
+            dic = []
+            for sympt in self.sympt_disea.keys():
+                if disease in self.sympt_disea[sympt]:
+                    dic.append(sympt)
+            self.disea_sympt[disease] = dic
         return
+    
+    
+problema = MDProblem(open("tests_project_nr2/tests/PUB2.txt","r"))
