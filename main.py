@@ -4,6 +4,8 @@ class MDProblem :
     # Place here your code to load problem from opened file object fh
     # and use probability . BayesNet () to create the Bayesian network.
         self.load(fh)
+        self.diseases_in_common()
+        self.make_bayes_net()
 
    # def solve ( self ) :
     # Place here your code to determine the maximum likelihood
@@ -11,6 +13,7 @@ class MDProblem :
     # Use probability . elimination_ask () to perform probabilistic
     # inference .
     #    return ( disease , likelihood )
+    
 
     def load(self, fh):
         
@@ -90,5 +93,78 @@ class MDProblem :
             self.disea_sympt[disease] = dic
         return
     
+    # Produces a dictionary of diseases in common
+    def diseases_in_common(self):
+        self.disease_com = {}
+        for d in self.disea_sympt.keys():
+            list_of_dise = []
+            for sympt in self.disea_sympt[d]:
+                for disease in self.sympt_disea[sympt]:
+                    if not(disease in list_of_dise):# and not(d==disease):
+                        list_of_dise.append(disease)
+            self.disease_com[d] = list_of_dise
+
+    
+    def make_bayes_net(self):
+        self.bayes_graph = []
+        
+        for t in  range(len(self.measurements)+1):#iterate over time
+            if(t == 0):
+                for d in  self.diseases:
+                    node = (f'{d}_{t}','',0.5)
+                    self.bayes_graph.append(node)
+            else:
+                for d in self.diseases:
+                    lista = []
+                    lista.append(f'{d}_{t}') # Name of the disease in t
+                    diseas_common = []
+                    for prev_d in self.disease_com[d]: # Parents of disease d in t-1
+                        diseas_common.append(f'{prev_d}_{t-1}')
+                    lista.append(' '.join(diseas_common))
+                    lista.append(self.truth_table(d))
+                        
+                    
+                    self.bayes_graph.append(tuple(lista))
+                    
+    def truth_table(self,disease):
+        table = {}
+        nr_bits = len(self.disease_com[disease])
+        for i in range(2**nr_bits):
+            truth_table_line = bin(i)[2:].zfill(nr_bits)
+            truth_table_line = truth_table_line.replace('0','T')
+            truth_table_line = truth_table_line.replace('1','F')
+            table[tuple(list(truth_table_line))] = 0
+        return table
+                    
+                
+     # def parent_diseases(self,t,d):#time t of the disease d      
+     #     for
+        
+        
     
 problema = MDProblem(open("tests_project_nr2/tests/PUB2.txt","r"))
+
+
+#%% Exemplo manual PUB2
+
+
+T, F = True, False
+
+# D covid common_cold flu asthma
+# S fever covid flu
+# S nose_clogged common_cold flu
+# S shortness_of_breath covid asthma
+# S fatigue covid common_cold asthma
+# E pcr covid 0.6893 0.3426 
+# E chest_xray common_cold 0.9893 0.0526
+# E feno asthma 0.8932 0.1213
+# E ridt flu 0.8321 0.2423
+# M pcr F
+# M pcr F chest_xray T
+# P 0.25
+
+
+    
+
+# pub2 = probability.BayesNet(bayes_graph)
+# probability.enumeration_ask('common_cold_2', dict(pcr_1=F, pcr_2=F,chest_xray_2=T), pub2).show_approx()
