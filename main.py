@@ -115,6 +115,8 @@ class MDProblem :
                     self.bayes_graph.append(node)
             else:
                 for d in self.diseases:
+                    
+                    ## Create node of the disease d
                     lista = []
                     lista.append(f'{d}_{t}') # Name of the disease in t
                     diseas_common = []
@@ -122,9 +124,24 @@ class MDProblem :
                         diseas_common.append(f'{prev_d}_{t-1}')
                     lista.append(' '.join(diseas_common))
                     lista.append(self.truth_table(d))
-                        
-                    
                     self.bayes_graph.append(tuple(lista))
+                    
+                ## Create node of the measurement
+                for measurement in self.measurements[t-1].keys():
+                    lista = []
+                    lista.append(f'{measurement}_{t}')
+                    aux = self.exam[measurement]['D']
+                    lista.append(f'{aux}_{t}')
+                    exam_table = {}
+                    exam_table['T'] = self.exam[measurement]['TPR']
+                    exam_table['F'] = self.exam[measurement]['FPR']
+                    lista.append(exam_table)
+                    self.bayes_graph.append(tuple(lista))
+                    
+                    
+        
+        
+                    
                     
     def truth_table(self,disease):
         table = {}
