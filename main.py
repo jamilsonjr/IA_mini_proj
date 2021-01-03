@@ -1,4 +1,5 @@
 import probability 
+import itertools
 class MDProblem :
     def __init__ ( self , fh ) :
     # Place here your code to load problem from opened file object fh
@@ -6,13 +7,15 @@ class MDProblem :
         self.load(fh)
         self.diseases_in_common()
         self.make_bayes_net()
+        # self.my_bayes_net = probability.BayesNet(self.bayes_graph)
 
-   # def solve ( self ) :
+    # def solve ( self ) :
     # Place here your code to determine the maximum likelihood
     # solution returning the solution disease name and likelihood .
     # Use probability . elimination_ask () to perform probabilistic
     # inference .
     #    return ( disease , likelihood )
+        # probability.enumeration_ask('common_cold_2', dict(pcr_1=F,pcr_2=F,chest_xray_2=T),self.my_bayes_net).show_approx()
     
 
     def load(self, fh):
@@ -48,7 +51,7 @@ class MDProblem :
                     # exams
                     elif(l[0] == "E"):
                         try:
-                            self.exam[l[1]] = {'D': l[2],'TPR': l[3],'FPR': l[4]}
+                            self.exam[l[1]] = {'D': l[2],'TPR': float(l[3]),'FPR': float(l[4])}
                         except:
                             print("Wrong format -> ", line)
                             exit()
@@ -107,7 +110,7 @@ class MDProblem :
     
     def make_bayes_net(self):
         self.bayes_graph = []
-        
+        T, F = True, False
         for t in  range(len(self.measurements)+1):#iterate over time
             if(t == 0):
                 for d in  self.diseases:
@@ -133,8 +136,8 @@ class MDProblem :
                     aux = self.exam[measurement]['D']
                     lista.append(f'{aux}_{t}')
                     exam_table = {}
-                    exam_table['T'] = self.exam[measurement]['TPR']
-                    exam_table['F'] = self.exam[measurement]['FPR']
+                    exam_table[T] = self.exam[measurement]['TPR']
+                    exam_table[F] = self.exam[measurement]['FPR']
                     lista.append(exam_table)
                     self.bayes_graph.append(tuple(lista))
                     
@@ -146,11 +149,15 @@ class MDProblem :
     def truth_table(self,disease):
         table = {}
         nr_bits = len(self.disease_com[disease])
+        
+        # T, F = True, False
         for i in range(2**nr_bits):
-            truth_table_line = bin(i)[2:].zfill(nr_bits)
-            truth_table_line = truth_table_line.replace('0','T')
-            truth_table_line = truth_table_line.replace('1','F')
-            line = tuple(list(truth_table_line))
+            line = []
+            truth_table_line = list(bin(i)[2:].zfill(nr_bits))
+            for place in truth_table_line:
+                line.append(bool(int(place)))
+            
+            line = tuple(line)
             
             
             table[line] = self.write_probability(line,disease,nr_bits)
@@ -158,8 +165,10 @@ class MDProblem :
                     
     def write_probability(self,line,disease,nr_bits):
         index_disease = self.disease_com[disease].index(disease)
-        if(line[index_disease] == 'F'):
+        if(line[index_disease] == False):
             return 0
+        elif(line[index_disease] == True and line.count(True) > 1):
+            return 0.25
         else:
             return 1
             
