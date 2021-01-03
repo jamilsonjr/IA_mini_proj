@@ -1,5 +1,5 @@
 import probability 
-import itertools
+import json
 class MDProblem :
     def __init__ ( self , fh ) :
     # Place here your code to load problem from opened file object fh
@@ -7,16 +7,36 @@ class MDProblem :
         self.load(fh)
         self.diseases_in_common()
         self.make_bayes_net()
-        # self.my_bayes_net = probability.BayesNet(self.bayes_graph)
+        self.bayes_net = probability.BayesNet(self.bayes_graph)
 
-    # def solve ( self ) :
+    def solve ( self ) :
     # Place here your code to determine the maximum likelihood
     # solution returning the solution disease name and likelihood .
     # Use probability . elimination_ask () to perform probabilistic
     # inference .
-    #    return ( disease , likelihood )
-        # probability.enumeration_ask('common_cold_2', dict(pcr_1=F,pcr_2=F,chest_xray_2=T),self.my_bayes_net).show_approx()
+        self.dise_likelihood = {}
+        max_likelihood = -1000.0
+        T = len(self.measurements)
+        final_dicti = self.create_dict_tests()
+        for disease in self.diseases:
+            prob = probability.elimination_ask(f'{disease}_{T}',final_dicti,self.bayes_net).show_approx()
+            prob = float((prob.split(',')[1]).split(':')[1])
+            #store
+            self.dise_likelihood[f'{disease}_{T}'] = prob
+            if(prob >= max_likelihood):
+                max_likelihood = prob
+                max_disease = disease
+        return ( max_disease , max_likelihood )
+            
     
+    # Dictionary that has all the tests
+    def create_dict_tests(self):
+        final_dic = {}
+        for t in range(1,len(self.measurements)+1,1):
+            for exam in self.measurements[t-1].keys():
+                final_dic[f'{exam}_{t}'] = self.measurements[t-1][exam]
+        return final_dic
+            
 
     def load(self, fh):
         
@@ -61,7 +81,7 @@ class MDProblem :
                         try:
                             dic = {}
                             for i in range(1, len(l), 2):
-                                dic[l[i]] = l[i+1]
+                                dic[l[i]] = True if(l[i+1]=='T') else False
 
                             self.measurements.append(dic)
                         except:
