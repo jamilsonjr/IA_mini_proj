@@ -150,10 +150,24 @@ class MDProblem :
             truth_table_line = bin(i)[2:].zfill(nr_bits)
             truth_table_line = truth_table_line.replace('0','T')
             truth_table_line = truth_table_line.replace('1','F')
-            table[tuple(list(truth_table_line))] = 0
+            line = tuple(list(truth_table_line))
+            
+            
+            table[line] = self.write_probability(line,disease,nr_bits)
         return table
                     
+    def write_probability(self,line,disease,nr_bits):
+        index_disease = self.disease_com[disease].index(disease)
+        if(line[index_disease] == 'F'):
+            return 0
+        else:
+            return 1
+            
+        # print(line)
                 
+        
+        
+        
      # def parent_diseases(self,t,d):#time t of the disease d      
      #     for
         
