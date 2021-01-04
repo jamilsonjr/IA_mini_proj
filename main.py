@@ -19,8 +19,9 @@ class MDProblem :
         T = len(self.measurements)
         final_dicti = self.create_dict_tests()
         for disease in self.diseases:
-            prob = probability.elimination_ask(f'{disease}_{T}',final_dicti,self.bayes_net).show_approx()
-            prob = float((prob.split(',')[1]).split(':')[1])
+            prob = probability.elimination_ask(f'{disease}_{T}',final_dicti,self.bayes_net)
+            # prob = float((prob.split(',')[1]).split(':')[1])
+            prob = float(prob[True])
             #store
             self.dise_likelihood[f'{disease}_{T}'] = prob
             if(prob >= max_likelihood):
@@ -92,7 +93,7 @@ class MDProblem :
                     # propagation probability
                     elif(l[0] == "P"):
                         try:
-                            self.prop_prob = l[1]
+                            self.prop_prob = float(l[1])
                         except:
                             print("Wrong format -> ", line)
                             exit()
@@ -131,8 +132,8 @@ class MDProblem :
     def make_bayes_net(self):
         self.bayes_graph = []
         T, F = True, False
-        for t in  range(len(self.measurements)+1):#iterate over time
-            if(t == 0):
+        for t in  range(1,len(self.measurements)+1,1):#iterate over time
+            if(t == 1):
                 for d in  self.diseases:
                     node = (f'{d}_{t}','',0.5)
                     self.bayes_graph.append(node)
@@ -149,18 +150,18 @@ class MDProblem :
                     lista.append(self.truth_table(d))
                     self.bayes_graph.append(tuple(lista))
                     
-                ## Create node of the measurement
-                for measurement in self.measurements[t-1].keys():
-                    lista = []
-                    lista.append(f'{measurement}_{t}')
-                    aux = self.exam[measurement]['D']
-                    lista.append(f'{aux}_{t}')
-                    exam_table = {}
-                    exam_table[T] = self.exam[measurement]['TPR']
-                    exam_table[F] = self.exam[measurement]['FPR']
-                    lista.append(exam_table)
-                    self.bayes_graph.append(tuple(lista))
-                    
+            ## Create node of the measurement
+            for measurement in self.measurements[t-1].keys():
+                lista = []
+                lista.append(f'{measurement}_{t}')
+                aux = self.exam[measurement]['D']
+                lista.append(f'{aux}_{t}')
+                exam_table = {}
+                exam_table[T] = self.exam[measurement]['TPR']
+                exam_table[F] = self.exam[measurement]['FPR']
+                lista.append(exam_table)
+                self.bayes_graph.append(tuple(lista))
+                
                     
         
         
@@ -188,21 +189,14 @@ class MDProblem :
         if(line[index_disease] == False):
             return 0
         elif(line[index_disease] == True and line.count(True) > 1):
-            return 0.25
+            return self.prop_prob
         else:
             return 1
             
-        # print(line)
-                
-        
-        
-        
-     # def parent_diseases(self,t,d):#time t of the disease d      
-     #     for
-        
+
         
     
-problema = MDProblem(open("tests_project_nr2/tests/PUB2.txt","r"))
+problema = MDProblem(open("tests_project_nr2/tests/PUB1.txt","r"))
 
 
 #%% Exemplo manual PUB2
