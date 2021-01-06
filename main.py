@@ -120,11 +120,14 @@ class MDProblem :
     # Produces a dictionary of diseases in common
     def diseases_in_common(self):
         self.disease_com = {}
-        for d in self.disea_sympt.keys():
+        for d in self.diseases:
             list_of_dise = []
+            if 0 == len(self.disea_sympt[d]):
+                self.disease_com[d] = [d]
+                continue
             for sympt in self.disea_sympt[d]:
                 for disease in self.sympt_disea[sympt]:
-                    if not(disease in list_of_dise):# and not(d==disease):
+                    if not(disease in list_of_dise):
                         list_of_dise.append(disease)
             self.disease_com[d] = list_of_dise
 
@@ -185,6 +188,8 @@ class MDProblem :
         return table
                     
     def write_probability(self,line,disease,nr_bits):
+        if (disease == 'd3'):
+            print('cheguei')
         index_disease = self.disease_com[disease].index(disease)
         if(line[index_disease] == False):
             return 0

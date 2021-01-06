@@ -1,4 +1,4 @@
-D covid common_cold flu asthma
+D covid common_cold flu asthma d3
 S fever covid flu
 S nose_clogged common_cold flu
 S shortness_of_breath covid asthma
